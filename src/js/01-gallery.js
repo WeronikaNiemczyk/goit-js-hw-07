@@ -17,22 +17,32 @@ const markup = galleryItems
 
 gallery.innerHTML = markup;
 
-const clickOnItem = (event) => {
+gallery.addEventListener(`click`, clickOnItem);
+
+function clickOnItem(event) {
   event.preventDefault();
 
   if (event.target.classList.contains(`gallery__item`)) return;
   const source = event.target.dataset.source;
 
-  const instance = basicLightbox.create(`
-  <img src="${source}" width="800" height="600">
-`);
+  const instance = basicLightbox.create(
+    `
+  <img src="${source}" width="800" height="600">`,
 
+    {
+      onShow: () => {
+        gallery.addEventListener(`keydown`, onEsc);
+      },
+      onClose: () => {
+        gallery.removeEventListener(`keydown`, onEsc);
+      },
+    }
+  );
+
+  const onEsc = (event) => {
+    if (event.key === `Escape`) {
+      instance.close();
+    }
+  };
   instance.show();
-};
-
-gallery.addEventListener(`click`, clickOnItem);
-// window.addEventListener("keydown", function (event) {
-//   if (event.keydown === "Escape") {
-//     instance.style.display = "none";
-//   }
-// });
+}
